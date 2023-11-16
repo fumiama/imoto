@@ -33,24 +33,24 @@ jobs:
         run: go mod tidy
 
       - name: Build linux-x64
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-linux-x64
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-linux-x64 cmd/main.go
       - name: Build linux-x86
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-linux-x86
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-linux-x86 cmd/main.go
 
       - name: Build windows-x64
-        run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-windows-x64.exe
+        run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-windows-x64.exe cmd/main.go
       - name: Build windows-x86
-        run: CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-windows-x86.exe
+        run: CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-windows-x86.exe cmd/main.go
 
       - name: Build linux-arm64
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-linux-arm64
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 GOARM=7 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-linux-arm64 cmd/main.go
       - name: Build linux-armhfv6
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-linux-armhfv6
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-linux-armhfv6 cmd/main.go
 
       - name: Build darwin-x64
-        run: CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-darwin-x64
+        run: CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-darwin-x64 cmd/main.go
       - name: Build darwin-arm64
-        run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -trimpath cmd/main.go -o artifacts/imoto-darwin-arm64
+        run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o artifacts/imoto-darwin-arm64 cmd/main.go
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2

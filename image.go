@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fumiama/imgsz"
 	"github.com/pkg/errors"
 )
 
@@ -35,6 +36,10 @@ func Live(u string) bool {
 
 // Bed image to server
 func Bed(t string, b []byte) (string, uint64, uint64, error) {
+	_, _, err := imgsz.DecodeSize(bytes.NewReader(b))
+	if err != nil {
+		return "", 0, 0, errors.Wrap(err, getThisFuncName())
+	}
 	m := md5.Sum(b)
 	u := API + hex.EncodeToString(m[:])
 	req, err := http.NewRequest("PUT", u, bytes.NewReader(b))

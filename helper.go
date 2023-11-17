@@ -5,15 +5,39 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"runtime"
 	"strconv"
 	"strings"
 	"unsafe"
 )
 
+func getFuncAndFileNameWithSkip(n int) (string, string) {
+	pc, fn, _, ok := runtime.Caller(n)
+	if !ok {
+		return "", ""
+	}
+	i := strings.LastIndex(fn, "/") + 1
+	if i > 0 {
+		fn = strings.TrimSuffix(fn[i:], ".go")
+	}
+	fullname := runtime.FuncForPC(pc).Name()
+	i = strings.LastIndex(fullname, ".") + 1
+	if i <= 0 || i >= len(fullname) {
+		return fullname, fn
+	}
+	return fullname[i:], fn
+}
+
+// getThisFuncName 获取正在执行的函数名
+func getThisFuncName() string {
+	x, _ := getFuncAndFileNameWithSkip(2)
+	return x
+}
+
 func GetMD5(u string) (m [md5.Size]byte, err error) {
 	u = strings.Trim(u, "/ ?&\n\t")
 	if len(u) != md5.Size*2 && len(u) != md5.Size {
-		err = errors.New("invalid path len: " + strconv.Itoa(len(u)))
+		err = errors.New(getThisFuncName() + ": invalid path len: " + strconv.Itoa(len(u)))
 		return
 	}
 	_, err = hex.Decode(m[:], StringToBytes(u))

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"io"
@@ -17,8 +16,17 @@ func main() {
 		panic(err)
 	}
 	m := md5.Sum(data)
-	p, _ := imoto.SplitMD5(m)
-	req, err := http.NewRequest("PUT", "http://127.0.0.1:8000/"+hex.EncodeToString(m[:]), bytes.NewReader(data))
+	imoto.API = "http://127.0.0.1:8000/"
+	token := "0000000000000000000000000000000000000000000000000000000000000000"
+	u, _, k, err := imoto.Bed(token, data)
+	if err != nil {
+		panic(err)
+	}
+	isexist := imoto.Live(u)
+	if !isexist {
+		panic("HEAD")
+	}
+	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -29,32 +37,7 @@ func main() {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		msg, _ := io.ReadAll(resp.Body)
-		panic("PUT error: " + imoto.BytesToString(msg))
-	}
-	req, err = http.NewRequest("HEAD", "http://127.0.0.1:8000/"+imoto.Uint64String(p), nil)
-	if err != nil {
-		panic(err)
-	}
-	resp, err = http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		msg, _ := io.ReadAll(resp.Body)
-		panic("HEAD error: " + imoto.BytesToString(msg))
-	}
-	req, err = http.NewRequest("GET", "http://127.0.0.1:8000/"+imoto.Uint64String(p), nil)
-	if err != nil {
-		panic(err)
-	}
-	resp, err = http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		msg, _ := io.ReadAll(resp.Body)
-		panic("HEAD error: " + imoto.BytesToString(msg))
+		panic("GET error: " + imoto.BytesToString(msg))
 	}
 	h := md5.New()
 	_, err = io.Copy(h, resp.Body)
@@ -66,26 +49,8 @@ func main() {
 	if m2 != m {
 		panic("GET error: expected " + hex.EncodeToString(m[:]) + " but got " + hex.EncodeToString(m2[:]))
 	}
-	req, err = http.NewRequest("DELETE", "http://127.0.0.1:8000/"+hex.EncodeToString(m[:]), nil)
+	_, err = imoto.Use(token, u, k)
 	if err != nil {
 		panic(err)
-	}
-	resp, err = http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		msg, _ := io.ReadAll(resp.Body)
-		panic("HEAD error: " + imoto.BytesToString(msg))
-	}
-	h = md5.New()
-	_, err = io.Copy(h, resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	h.Sum(m2[:0])
-	if m2 != m {
-		panic("DELETE error: expected " + hex.EncodeToString(m[:]) + " but got " + hex.EncodeToString(m2[:]))
 	}
 }

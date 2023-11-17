@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	API = "https://imoto.seku.su"
+	API = "https://imoto.seku.su/"
 )
 
 var (
